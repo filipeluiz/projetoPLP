@@ -1,0 +1,32 @@
+
+<programa>        :=   int main"("")" <bloco>
+<bloco>           :=   “{“ {<decl_var>}* {<comando>}* “}”
+<decl_var> 	      :=   <tipo> <id> {,<id>}* ";"
+<comando>         :=   <comando_básico> | <iteração> | if "("<expr_relacional>")" <comando> {else <comando>}?
+<tipo> 		        :=   int | float | char | string
+<comando_básico>  :=   <atribuição> | <bloco>
+<iteração>        :=   while "("<expr_relacional>")" <comando>
+<expr_relacional> :=   <expr_arit> <op_relacional> <expr_arit>
+<atribuição>      :=   <id> "=" <expr_arit> ";"
+<expr_arit>       :=   <expr_arit> "+" <termo>   | <expr_arit> "-" <termo> | <termo>
+<termo>           :=   <termo> "*" <fator> | <termo> “/” <fator> | <fator>
+<fator>           :=   “(“ <expr_arit> “)” | <id> | <float> | <inteiro> | <char>
+
+------------------------------------------------------------------------------------------------------------------------
+
+<tipo>            :=    int | float | char | string
+<id>              :=    _ | <letra> | <digito>
+<letra>           :=    A | B | C | D | E | F | G | H | I | J | K | L | M | N | O | P | Q | R | S | T | U | V | W | Y | Z
+                        a | b | c | d | e | f | g | h | i | j | k | l | m | n | o | p | q | r | s | t | u | v | w | y | z
+<digito>          :=    0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+<funcao>          :=    <tipo> <id> "(" ")" <bloco>
+<bloco>           :=   “{“ {<decl_var>}* {<comando>}* “}”
+<decl_var> 	      :=   <tipo> <id> {,<id>}* ";"
+<comando>         :=   <comando_básico> | <iteração> | if "("<expr_relacional>")" <comando> {else <comando>}?
+<comando_básico>  :=   <atribuição> | <bloco>
+<iteração>        :=   while "("<expr_relacional>")" <comando>
+<expr_relacional> :=   <expr_arit> <op_relacional> <expr_arit>
+<atribuição>      :=   <id> "=" <expr_arit> ";"
+<expr_arit>       :=   <expr_arit> "+" <termo>   | <expr_arit> "-" <termo> | <termo>
+<termo>           :=   <termo> "*" <fator> | <termo> “/” <fator> | <fator>
+<fator>           :=   “(“ <expr_arit> “)” | <id> | <float> | <inteiro> | <char>
