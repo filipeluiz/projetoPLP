@@ -18,21 +18,23 @@ public enum Classification {
     ABERTAPARENTESES,   //14
     FECHACHAVES,        //15
     ABERTACHAVES,       //16
-    VIRGULA,            //17
-    PONTOVIRGULA,       //18
-    PONTO,              //19
-    MAIN,               //20
-    IF,                 //21
-    ELSE,               //22
-    WHILE,              //23
-    DO,                 //24
-    FOR,                //25
-    INT,                //26
-    FLOAT,              //27
-    CHAR,               //28
-    LITERAL,            //29
-    TIPOINT,            //30
-    TIPOCHAR,           //31
-    TIPOFLOAT,          //32
-    PRINTF,             //33
+    FECHACOLCHETES,     //17
+    ABERTACOLCHETES,    //18
+    VIRGULA,            //19
+    PONTOVIRGULA,       //20
+    PONTO,              //21
+    MAIN,               //22
+    IF,                 //23
+    ELSE,               //24
+    WHILE,              //25
+    DO,                 //26
+    FOR,                //27
+    INT,                //28
+    FLOAT,              //29
+    CHAR,               //30
+    LITERAL,            //31
+    TIPOINT,            //32
+    TIPOCHAR,           //33
+    TIPOFLOAT,          //34
+    PRINTF,             //35
 }

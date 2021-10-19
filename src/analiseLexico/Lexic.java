@@ -286,6 +286,22 @@ public class Lexic {
                 return this.token;
             }
 
+            if(this.lk == '[') { // Colchetes aberta
+                this.lexema.append(this.lk);
+                this.token.setTypeToken(Classification.ABERTACOLCHETES.ordinal());
+                this.token.setLexema(this.lexema);
+                this.lk = this.nextChar();
+                return this.token;
+            }
+
+            if(this.lk == ']') { // Colchetes fechada
+                this.lexema.append(this.lk);
+                this.token.setTypeToken(Classification.FECHACOLCHETES.ordinal());
+                this.token.setLexema(this.lexema);
+                this.lk = this.nextChar();
+                return this.token;
+            }
+
             if(this.lk == ';') { // Ponto virgula
                 this.lexema.append(this.lk);
                 this.token.setTypeToken(Classification.PONTOVIRGULA.ordinal());
