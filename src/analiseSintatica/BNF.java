@@ -479,8 +479,24 @@ public class BNF {
 
         if(!literal.equalsIgnoreCase("") && value.equalsIgnoreCase("")) {
             // Com literal e sem value
-            aux = literal.substring(1, literal.length() - 1);
-            System.out.print(aux);
+            String msg = literal.substring(1, literal.length() - 1);
+            String newMsg = "";
+            int indice = msg.indexOf("\\n");
+
+            if(indice > 0) {
+                newMsg = msg.substring(0, indice);
+                msg = msg.substring(indice+2, msg.length());
+
+                System.out.println(newMsg);
+
+                while(msg.contains("\\n")) {
+                    indice = msg.indexOf("\\n");
+                    newMsg = msg.substring(0, indice);
+                    msg = msg.substring(indice+2, msg.length());
+                    System.out.println(newMsg);
+                }
+            }
+            System.out.println(msg);
         }
         else if(literal.equalsIgnoreCase("") && !value.equalsIgnoreCase("")) {
             // sem literal e com value
