@@ -1,4 +1,4 @@
-#Projeto de Paradigmas de Linguagem de Programação ̃
+# Projeto de Paradigmas de Linguagem de Programação ̃
 Interpretador de Linguagem de Programação ̃
 
 Resumo
@@ -8,7 +8,7 @@ conhecida. Para isso cada equipe deve escolher uma linguagem de programação. A
 volver um projeto para toda a linguagem escolhida. O interpretador deve executar somente os um subconjunto
 dos elementos.
 
-##Elementos Basicos  ́
+## Elementos Basicos  ́
 A linguagem possui as seguintes características:
 • Comandos
 – Comandos condicionais: no mínimo, IF e ELSE. Caso a linguagem nao possua ELSE, ele não precisa  ̃
@@ -50,7 +50,7 @@ inteiro ou string em um arranjo), not (negação).  ̃
 • Função:  ̃
 – .length: obter o tamanho de um arranjo.
 
-Execucão ̃
+## Execucão ̃
 
 Deve ser desenvolvido um interpretador em linha de comando que recebe um programa-fonte na linguagem esco-
 lhida como argumento e executa os comandos especificados pelo programa. A saída do programa deve ser a mesma
@@ -60,7 +60,7 @@ O programa devera abortar sua execução, em caso de qualquer erro léxico, sint
 responsabilidade da equipe dizer qual o erro específico (lexico, semântico ou sintático). Somente uma mensagem  ́
 de erro padrao deve ser apresentada.  ̃
 
-Avaliação ̃
+## Avaliação ̃
 O trabalho deve ser feito em grupo de ate cinco alunos, sendo esse limite superior estrito. O trabalho será avaliado  ́
 em 10 pontos, onde essa nota sera multiplicada por um fator entre 0.0 e 1.0 para compor a nota de cada aluno  ́
 individualmente.
