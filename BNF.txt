@@ -2,8 +2,9 @@
 <programa>        :=   int main"("")" <bloco>
 <bloco>           :=   “{“ {<decl_var>}* {<comando>}* “}”
 <decl_var> 	      :=   <tipo> <id> {,<id>}* {<atribuição>}? ";"
-<comando>         :=   <comando_básico> | <iteração> | if "("<expr_relacional>")" <comando> {else <comando>}?
-<tipo> 		        :=   int | float | char | string
+<comando>         :=   <comando_básico> | <iteração> |
+                       if "("<expr_relacional>")" <comando> {else <comando>}? | printf "("<expr_relacional>")" ";"
+<tipo> 		      :=   int | float | char | string
 <comando_básico>  :=   <atribuição> | <bloco>
 <iteração>        :=   while "("<expr_relacional>")" <comando>
 <expr_relacional> :=   <expr_arit> <op_relacional> <expr_arit>
