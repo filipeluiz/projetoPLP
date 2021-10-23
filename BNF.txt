@@ -1,7 +1,7 @@
 
 <programa>        :=   int main"("")" <bloco>
 <bloco>           :=   “{“ {<decl_var>}* {<comando>}* “}”
-<decl_var> 	      :=   <tipo> <id> {,<id>}* ";"
+<decl_var> 	      :=   <tipo> <id> {,<id>}* {<atribuição>}? ";"
 <comando>         :=   <comando_básico> | <iteração> | if "("<expr_relacional>")" <comando> {else <comando>}?
 <tipo> 		        :=   int | float | char | string
 <comando_básico>  :=   <atribuição> | <bloco>
