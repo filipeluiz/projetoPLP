@@ -8,11 +8,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 public class BNF {
-    private Token lk;
+    private Token lk, loop;
     private final Lexic lexico;
     private final Repository table;
     private Symbol symbols;
     private int scope;
+    private boolean bool = true;
 
     public BNF(FileInputStream file) throws IOException {
         this.lexico = new Lexic(file);
@@ -33,6 +34,7 @@ public class BNF {
         this.nextToken(); // Vai para {
 
         this.bloco(); // Dentro bloco
+//        System.out.println(this.table.getTable());
     }
 
     private void bloco() throws IOException {
@@ -54,7 +56,7 @@ public class BNF {
                 this.lk.getTypeToken() == Classification.IF.ordinal()) {
             this.comando();
         }
-
+        System.out.println(this.lk);
         while(this.lk.getTypeToken() == Classification.PRINTF.ordinal()) {
             this.print();
         }
@@ -75,7 +77,9 @@ public class BNF {
             }
         }
         this.scope--;
+        System.out.println(this.lk);
         this.nextToken();
+        System.out.println(this.table.getTable());
     }
 
     private int tipo() throws IOException {
@@ -103,9 +107,9 @@ public class BNF {
         this.symbols.setType(type);
         this.symbols.setScope(this.scope);
         this.symbols.setLexema(this.lk.getLexema());
-
+        System.out.println(this.lk);
         this.id();
-
+        System.out.println(this.lk);
         if(this.lk.getTypeToken() == Classification.VIRGULA.ordinal()) {
             this.table.push(this.symbols);
             while(this.lk.getTypeToken() == Classification.VIRGULA.ordinal()) {
@@ -141,7 +145,14 @@ public class BNF {
             this.comandoBasico();
         }
         else if(this.lk.getTypeToken() == Classification.WHILE.ordinal() || this.lk.getTypeToken() == Classification.DO.ordinal()) {
-            this.iteracao();
+            loop = this.lk;
+            while(bool) {
+                this.iteracao();
+                if(bool) {
+                    this.lk.setLexema(loop.getLexema());
+                    this.lk.setTypeToken(loop.getTypeToken());
+                }
+            }
         }
         else if(this.lk.getTypeToken() == Classification.IF.ordinal()) {
             this.nextToken();
@@ -150,19 +161,31 @@ public class BNF {
                 System.out.println("Não encontrado '('" + " " + this.lk + " " + this.lexico.getLine() + " " + this.lexico.getColumn());
             }
             this.nextToken();
-            this.exprRelacional();
+            bool = this.exprRelacional();
 
             if(this.lk.getTypeToken() != Classification.FECHAPARENTESES.ordinal()){
 //                throw new ErroParserException("Não encontrado ')'", this.scanner.getLine(), this.scanner.getColumn());
                 System.out.println("Não encontrado ')'" + " " + this.lk + " " + this.lexico.getLine() + " " + this.lexico.getColumn());
             }
             this.nextToken();
-            this.comando();
-
+            if(bool) {
+                this.comando();
+                while(this.lk.getTypeToken() != Classification.FECHACHAVES.ordinal()) {
+                    this.nextToken();
+                }
+            }
+            else {
+                while(this.lk.getTypeToken() != Classification.ELSE.ordinal()) {
+                    this.nextToken();
+                }
+                bool = true;
+            }
+            System.out.println(this.lk);
             if(this.lk.getTypeToken() == Classification.ELSE.ordinal()){
                 this.nextToken();
                 this.comando();
             }
+            System.out.println(this.lk);
         } else {
 //            throw new ErroParserException("A declaração tem corpo vazio.", this.scanner.getLine(), this.scanner.getColumn());
             System.out.println("A declaração tem corpo vazio." + " " + this.lk + " " + this.lexico.getLine() + " " + this.lexico.getColumn());
@@ -175,7 +198,12 @@ public class BNF {
             this.atribuicao();
         }
         else if(this.lk.getTypeToken() == Classification.ABERTACHAVES.ordinal()) {
-            this.bloco();
+            if(bool) {
+                this.bloco();
+            }
+            else {
+                nextToken();
+            }
         }
         else {
 //            throw new ErroParserException("Não encontrada a declaração", this.scanner.getLine(), this.scanner.getColumn());
@@ -185,6 +213,7 @@ public class BNF {
 
     private void iteracao() throws IOException {
         // <iteração> -> while "("<expr_relacional>")" <comando> | do <comando> while "("<expr_relacional>")"";"
+
         if(this.lk.getTypeToken() == Classification.WHILE.ordinal()){
             this.nextToken();
             if(this.lk.getTypeToken() != Classification.ABERTAPARENTESES.ordinal()){
@@ -192,14 +221,22 @@ public class BNF {
                 System.out.println("Não encontrado '('" + " " + this.lk + " " + this.lexico.getLine() + " " + this.lexico.getColumn());
             }
             this.nextToken();
-            this.exprRelacional();
+            bool = this.exprRelacional();
 
             if(this.lk.getTypeToken() != Classification.FECHAPARENTESES.ordinal()){
 //                throw new ErroParserException("Não encontrado ')'", this.scanner.getLine(), this.scanner.getColumn());
                 System.out.println("Não encontrado ')'" + " " + this.lk + " " + this.lexico.getLine() + " " + this.lexico.getColumn());
             }
+
             this.nextToken();
-            this.comando();
+
+            if(bool) {
+                this.comando();
+            } else {
+                while(this.lk.getTypeToken() != Classification.FECHACHAVES.ordinal()) {
+                    this.nextToken();
+                }
+            }
         }
         else if(this.lk.getTypeToken() == Classification.DO.ordinal()) {
             this.nextToken();
@@ -231,12 +268,32 @@ public class BNF {
         }
     }
 
-    private void exprRelacional() throws IOException {
+    private boolean exprRelacional() throws IOException {
         // <expr_relacional> -> <expr_arit> <op_relacional> <expr_arit>
-        this.exprArit();
-        this.opRelacional();
-        this.exprArit();
+        int a1 = Integer.parseInt(this.exprArit().getValue().toString());
+        String op = this.opRelacional().getLexema().toString();
+        int a2 = Integer.parseInt(this.exprArit().getValue().toString());
 
+        if(op.equalsIgnoreCase(">=")) {
+            return a1 >= a2;
+        }
+        else if(op.equalsIgnoreCase("<=")) {
+            return a1 <= a2;
+        }
+        else if(op.equalsIgnoreCase(">")) {
+            return a1 > a2;
+        }
+        else if(op.equalsIgnoreCase("<")) {
+            return a1 < a2;
+        }
+        else if(op.equalsIgnoreCase("==")) {
+            return a1 == a2;
+        }
+        else if(op.equalsIgnoreCase("!=")) {
+            return a1 != a2;
+        }
+
+        return false;
     }
 
     private Token opRelacional() throws IOException {
@@ -301,7 +358,7 @@ public class BNF {
         this.nextToken(); // Sai ponto virgula
     }
 
-    private Symbol exprArit() throws IOException {
+    private Symbol  exprArit() throws IOException {
         Symbol expr1, expr2;
         StringBuffer temporary = new StringBuffer();
         Token op;
@@ -331,8 +388,20 @@ public class BNF {
                 expr1.setValue(temporary);
             }
             else if(op.getTypeToken() == Classification.SUBTRACAO.ordinal()) {
-                value1 = Integer.parseInt(expr1.getLexema().toString());
-                value2 = Integer.parseInt(expr2.getLexema().toString());
+                if(expr1.getValue() != null) {
+                    value1 = Integer.parseInt(expr1.getValue().toString());
+                }
+                else {
+                    value1 = Integer.parseInt(expr1.getLexema().toString());
+                }
+
+                if(expr2.getValue() != null) {
+                    value2 = Integer.parseInt(expr2.getValue().toString());
+                }
+                else {
+                    value2 = Integer.parseInt(expr2.getLexema().toString());
+                }
+
                 total = value1 - value2;
                 temporary.append(total);
                 expr1.setLexema(temporary);
@@ -388,7 +457,7 @@ public class BNF {
     }
 
     private Symbol fator() throws IOException {
-        // <fator> -> “(“ <expr_arit> “)” | <id> | <float> | <inteiro> | <char> | <literal>
+        // <fator> -> “(“ <expr_arit> “)” | <id> | <float> | <inteiro> | <char> | <literal> | <incremento> | <decremento>
         Symbol symbol = new Symbol();
 
         // “(“ <expr_arit> “)”
@@ -404,25 +473,27 @@ public class BNF {
         else if(this.lk.getTypeToken() == Classification.ID.ordinal()) {
             symbol.setLexema(this.lk.getLexema());
             symbol.setScope(this.scope);
-
             if(this.table.search(symbol) == null) {
 //                throw new ErroSemanticException("Variável não foi declarada", this.scanner.getLexema(),this.scanner.getLine(),this.scanner.getColumn());
                 System.out.println("Variável não foi declarada" + " " + this.lk + " " + this.lexico.getLine() + " " + this.lexico.getColumn());
             }
 
             symbol.setType(this.table.search(symbol).getType());
+            symbol.setValue(this.table.search(symbol).getValue());
 
             this.id();
         }
         else if(this.lk.getTypeToken() == Classification.TIPOFLOAT.ordinal()) {
             symbol.setType(this.lk.getTypeToken());
             symbol.setLexema(this.lk.getLexema());
+            symbol.setValue(this.lk.getLexema());
             symbol.setScope(this.scope);
             this.nextToken();
         }
         else if(this.lk.getTypeToken() == Classification.TIPOINT.ordinal()) {
             symbol.setType(this.lk.getTypeToken());
             symbol.setLexema(this.lk.getLexema());
+            symbol.setValue(this.lk.getLexema());
             symbol.setScope(this.scope);
             this.nextToken();
         }
@@ -477,36 +548,34 @@ public class BNF {
     private void convertPrint(String literal, String value) throws IOException {
         String aux, type;
 
-        if(!literal.equalsIgnoreCase("") && value.equalsIgnoreCase("")) {
+        if (!literal.equalsIgnoreCase("") && value.equalsIgnoreCase("")) {
             // Com literal e sem value
             String msg = literal.substring(1, literal.length() - 1);
             String newMsg = "";
             int indice = msg.indexOf("\\n");
 
-            if(indice > 0) {
+            if (indice > 0) {
                 newMsg = msg.substring(0, indice);
-                msg = msg.substring(indice+2, msg.length());
+                msg = msg.substring(indice + 2, msg.length());
 
                 System.out.println(newMsg);
 
-                while(msg.contains("\\n")) {
+                while (msg.contains("\\n")) {
                     indice = msg.indexOf("\\n");
                     newMsg = msg.substring(0, indice);
-                    msg = msg.substring(indice+2, msg.length());
+                    msg = msg.substring(indice + 2, msg.length());
                     System.out.println(newMsg);
                 }
             }
             System.out.println(msg);
-        }
-        else if(literal.equalsIgnoreCase("") && !value.equalsIgnoreCase("")) {
+        } else if (literal.equalsIgnoreCase("") && !value.equalsIgnoreCase("")) {
             // sem literal e com value
             System.out.print(value);
             this.nextToken();
-        }
-        else {
+        } else {
             // com literal e com value
             type = literal.substring(literal.length() - 3, literal.length() - 1);
-            if(type.equalsIgnoreCase("%f") || type.equalsIgnoreCase("%d")) {
+            if (type.equalsIgnoreCase("%f") || type.equalsIgnoreCase("%d") || type.equalsIgnoreCase("%i")) {
                 aux = literal.replace(type, "");
             } else {
                 aux = literal;
@@ -520,17 +589,20 @@ public class BNF {
             a1.setScope(this.scope);
             a1 = this.table.search(a1);
 
-            if(type.equalsIgnoreCase("%f")) {
+            if (type.equalsIgnoreCase("%f")) {
                 aux = aux + a1.getValue() + ".000000";
                 System.out.print(aux);
-            }
-            else {
+            } else {
                 System.out.print(aux + a1.getValue());
             }
 
             this.nextToken();
         }
+        System.out.println(this.lk);
+        this.nextToken();
         this.nextToken();
         this.nextToken();
     }
+
+
 }
